@@ -5,9 +5,9 @@ from torch.optim import Optimizer
 
 class AdamW(Optimizer):
     def __init__(self, params, lr=1e-3, beta1=0.9, beta2=0.99, eps=1e-7,
-                 amsgrad=False, weight_decay=0, decoupled_weight_decay=0):
+                 amsgrad=False, weight_decay=0):
         defaults = dict(lr=lr, beta1=beta1, beta2=beta2, eps=eps, amsgrad=amsgrad,
-                        weight_decay=weight_decay, decoupled_weight_decay=decoupled_weight_decay)
+                        weight_decay=weight_decay)
         super(AdamW, self).__init__(params, defaults)
 
     def step(self):
@@ -35,8 +35,8 @@ class AdamW(Optimizer):
                 b2 = group['beta2']
                 t += 1
 
-                if group['weight_decay'] != 0:
-                    grad.add_(group['weight_decay'], p.data)  # weight decay
+                # if group['weight_decay'] != 0:
+                #     grad.add_(group['weight_decay'], p.data)  # weight decay
 
                 m = torch.mul(m, b1) + (1-b1) * grad
                 v = torch.mul(v, b2) + (1-b2) * grad**2
@@ -54,7 +54,7 @@ class AdamW(Optimizer):
                 state['m'] = m
                 state['v'] = v
 
-                if group['decoupled_weight_decay'] != 0:
-                    grad.add_(group['decoupled_weight_decay'], p.data)  # decoupled weight decay, AdamW
+                if group['weight_decay'] != 0:
+                    grad.add_(group['weight_decay'], p.data)  # decoupled weight decay, AdamW
 
         return loss

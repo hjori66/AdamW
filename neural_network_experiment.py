@@ -1,7 +1,7 @@
 from model import CNN
 from amsgrad import AMSGrad
 from adamw import AdamW
-from cifar10_dataset import dataset
+from cifar_dataset import cifar100_dataset
 from utils import fix_seed, plot_CIFAR
 import torch
 import argparse
@@ -15,8 +15,8 @@ def main(args, model, optimizer, trainloader, testloader):
         running_loss = 0
         for i, data in enumerate(trainloader, 0):
             x, y = data
-            x = x.cuda()
-            y = y.cuda()
+            # x = x.cuda()
+            # y = y.cuda()
             optimizer.zero_grad()
             outputs = model(x)
             loss = criterion(outputs, y)
@@ -30,8 +30,8 @@ def main(args, model, optimizer, trainloader, testloader):
     with torch.no_grad():
         for idx, data in enumerate(testloader):
             x, y = data
-            x = x.cuda()
-            y = y.cuda()
+            # x = x.cuda()
+            # y = y.cuda()
             outputs = model(x)
             _, predicted = torch.max(outputs.data, 1)
             loss = criterion(outputs, y)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     fix_seed(args.seed)
 
-    trainloader, testloader = dataset(args.batch_size)
+    trainloader, testloader = cifar100_dataset(args.batch_size)
     # model = CNN()
     # model = torch.hub.load('pytorch/vision:v0.5.0', 'resnet18', pretrained=True)
     # model = torch.hub.load('pytorch/vision:v0.5.0', 'vgg11')
@@ -64,27 +64,27 @@ if __name__ == '__main__':
     # ams_train_loss, ams_test_loss = main(args, model, amsgrad, trainloader, testloader)
 
     model = torch.hub.load('pytorch/vision:v0.5.0', 'vgg11')
-    model.cuda()
+    # model.cuda()
     print('\nProcessing AdamW (with decoupled weight decay)...')
     adamw = torch.optim.AdamW(model.parameters(), lr=args.lr,
                               betas=(args.beta1, args.beta2), eps=args.eps, weight_decay=args.weight_decay)
     adamw_train_loss, adamw_test_loss = main(args, model, adamw, trainloader, testloader)
 
     model = torch.hub.load('pytorch/vision:v0.5.0', 'vgg11')
-    model.cuda()
+    # model.cuda()
     print('\nProcessing SGD...')
     sgd = torch.optim.SGD(model.parameters(), lr=args.lr)
     sgd_train_loss, sgd_test_loss = main(args, model, sgd, trainloader, testloader)
 
     model = torch.hub.load('pytorch/vision:v0.5.0', 'vgg11')
-    model.cuda()
+    # model.cuda()
     print('\nProcessing Adam...')
     adam = torch.optim.Adam(model.parameters(), lr=args.lr,
                             betas=(args.beta1, args.beta2), eps=args.eps)
     adam_train_loss, adam_test_loss = main(args, model, adam, trainloader, testloader)
 
     model = torch.hub.load('pytorch/vision:v0.5.0', 'vgg11')
-    model.cuda()
+    # model.cuda()
     print('\nProcessing Adam with weight decay...')
     adam_wd = torch.optim.Adam(model.parameters(), lr=args.lr,
                             betas=(args.beta1, args.beta2), eps=args.eps, weight_decay=args.weight_decay)

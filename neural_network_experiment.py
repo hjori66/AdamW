@@ -53,7 +53,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--batch_size', default=128, type=float)
-    parser.add_argument('--epochs', default=20, type=int)
+    parser.add_argument('--epochs', default=100, type=int)
     parser.add_argument('--momentum', default=0.9, type=float)
     parser.add_argument('--eps', default=1e-7, type=float)
     parser.add_argument('--beta1', default=0.9, type=float)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
     if args.optimizer == 'SGD':
         print('\nProcessing SGD...')
-        sgd = torch.optim.SGD(model.parameters(), lr=1e-2, momentum=args.momentum)
+        sgd = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
         sgd_train_loss, sgd_test_loss = main(args, model, sgd, trainloader, testloader)
 
     elif args.optimizer == 'Adam':
@@ -104,8 +104,8 @@ if __name__ == '__main__':
         ada_train_loss, ada_test_loss = main(args, model, adagrad, trainloader, testloader)
 
     else:
-        # opt_list = ['SGD', 'Adam', 'Adam_weight_decay', 'AdamW', 'AMSGrad', 'AdaGrad']
-        opt_list = ['Adam']
+        opt_list = ['SGD', 'Adam', 'Adam_weight_decay', 'AdamW', 'AMSGrad', 'AdaGrad']
+        # opt_list = ['Adam']
         train_loss_list = []
         test_loss_list = []
         for opt in opt_list:
